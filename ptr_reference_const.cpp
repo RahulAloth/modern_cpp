@@ -96,9 +96,3 @@ public:
 private:
 	int value;
 };
-
-int main(void){
-	play_with_pointers();
-	play_with_references();
-	return 0;
-}
