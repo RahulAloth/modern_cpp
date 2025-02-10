@@ -96,3 +96,42 @@ public:
 private:
 	int value;
 };
+
+/*
+Auto Keyword is used to declare a variable without specifying its type. Allows the compiler to automatically infer the type
+from the initializer. This means initializer is important.
+auto <identifier> = <initializer>
+The auto keyword in modern C++ is a powerful feature introduced in C++11 that allows the compiler to automatically deduce the type 
+of a variable from its initializer.This can make your code more readable and maintainable by reducing the need for explicit type declarations.
+	Main Points :
+Type Deduction : When you use auto, the compiler determines the type of the variable based on the value you assign to it.For example :
+*/
+	auto x = 42; // x is deduced to be of type int
+	auto y = 3.14; // y is deduced to be of type double
+/*
+	Complex Types : auto is particularly useful for complex types, such as iterators or lambda expressions, where the type can be 
+	long and cumbersome to write out :
+*/
+	std::vector<int> vec = { 1, 2, 3, 4 };
+	auto it = vec.begin(); // it is deduced to be of type std::vector<int>::iterator
+
+// Function Return Types : Since C++14, you can use auto to deduce the return type of a function :
+	auto add(int a, int b) {
+		return a + b; // return type is deduced to be int
+	}
+
+// Structured Bindings : Introduced in C++17, auto can be used with structured bindings to unpack tuples or pairs :
+	std::tuple<int, double, std::string> t(1, 2.3, "hello");
+	auto [i, d, s] = t; // i is int, d is double, s is std::string
+
+// Since C++17, the compiler can deduce template arguments for class templates from their constructors :
+std::pair p(1, 2.3); // p is deduced to be std::pair<int, double>
+/*
+Drawbacks:
+Potential Ambiguity : Overuse of auto can sometimes make the code less clear, as the type is not explicitly stated.
+Type Deduction Rules : Understanding the rules of type deduction is crucial to avoid unexpected behaviors.
+Best Practices :
+Use auto when the type is obvious from the context or when the type is complex and verbose.
+Avoid using auto when it makes the code less readable or when the type is not immediately clear.
+*/
+}
