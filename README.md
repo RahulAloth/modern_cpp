@@ -1,2 +1,2 @@
 # modern_cpp
-CPP 11/14/17/20, Concurrrency, Design Patterns in Modern C++
+This project encompasses learning topics for C++11, C++14, C++17, and C++20, including Concurrency and Design Patterns in Modern C++. It can be forked and used as a learning reference for newcomers who want to learn C++ and Algorithms.
