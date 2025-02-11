@@ -46,3 +46,13 @@ extern "C" {
 void myCFunction(int x, int y) {
     cout << "Sum of int's: " << add(x, y) << endl; // Calls double version   
 }
+
+/*
+In Modern C++, default arguments allow you to specify a default value for a 
+function parameter. This means that if the caller does not provide a value for 
+that parameter, the default value will be used. Here’s a simple example:
+*/
+void print(int x, int y = 10) {
+    std::cout << "x: " << x << ", y: " << y << std::endl;
+}
+
