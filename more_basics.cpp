@@ -209,5 +209,22 @@ int function_state_machine() {
     return 0;
 }
 
-/**********************************************************************/
+/********************************Name Space : Start ******d*************************************************/
+/*In C++, a namespace is a declarative region that provides a scope to the identifiers(names of types, functions,
+variables, etc.) inside it.Namespaces are used to organize code into logical groups and to prevent name collisions, 
+especially whencode includes multiple libraries. */
 
+namespace names_space{
+    int obj_variable;
+    void my_function() {
+        cout << "Namespace example" << endl;
+    };
+}
+// using alias.
+namespace MyAlias = names_space;
+// using directive.
+using namespace names_space;
+
+using MyAlias::obj_variable;
+using names_space::my_function;
+/********************************Name Space : End   ********************************************************/
