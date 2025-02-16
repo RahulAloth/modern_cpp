@@ -131,3 +131,42 @@ int memory_management_realloc() {
     // Free the allocated memory
     free(ptr);
 }
+
+/*
+Dynamic memory allocation in c++
+new: Allocates memory on heap.
+delete : deallocate memory.
+Compile-Time Allocation: Memory is allocated at compile time.
+Fixed Size: The size of the memory block is fixed and cannot be changed during runtime.
+Run-Time Allocation: Memory is allocated during the execution of the program.
+Flexible Size: The size of the memory block can be changed during runtime.
+*/
+
+int dynamic_memory_allocation_new() {
+    // Allocate memory for a single integer
+    int* ptr = new int;
+    *ptr = 5;
+    std::cout << "Value: " << *ptr << std::endl;
+
+    // Allocate memory for an array of 10 integers
+    int* arr = new int[10];
+    for (int i = 0; i < 10; ++i) {
+        arr[i] = i + 1;
+    }
+
+    // Print the array
+    for (int i = 0; i < 10; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // Deallocate memory and set pointers to nullptr
+    delete ptr;
+    ptr = nullptr; // Set pointer to nullptr
+
+    // Deallocate memory and set pointers to nullptr
+    delete[] arr;
+    arr = nullptr; // Set pointer to nullpt
+
+    return 0;
+}
