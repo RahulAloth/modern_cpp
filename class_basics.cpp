@@ -1,4 +1,5 @@
 /*
+This file explains important concepts used in a class. It does not cover very basics of class. It is assume that programmer already having basic understanding of class.
 this Pointer:
 
 The this pointer is an implicit pointer available in non-static member functions of a class. 
@@ -61,3 +62,64 @@ int class_main() {
 
     return 0;
 }
+/*
+COPY CONSTRUCTOR:
+A user-defined copy constructor is a constructor that you explicitly define to control how an object is copied.
+This is particularly useful when your class involves dynamic memory allocation or other resources that need to be managed carefully. 
+By defining your own copy constructor, you can ensure that each object gets its own copy of the resources, preventing issues 
+like double deletion or unintended sharing of resources.
+
+Example of a User-Defined Copy Constructor
+Here’s an example to illustrate a user-defined copy constructor:
+*/
+
+class copy_constructor {
+private:
+    int* data;
+
+public:
+    // Constructor
+    copy_constructor(int val) {
+        data = new int;
+        *data = val;
+    }
+
+    // User-defined copy constructor (deep copy)
+    copy_constructor(const copy_constructor& source) {
+        data = new int;
+        *data = *(source.data);
+        cout << "User-defined copy constructor called!" << endl;
+    }
+
+    // Destructor
+    ~copy_constructor() {
+        delete data;
+    }
+
+    void display() const {
+        cout << "Data: " << *data << endl;
+    }
+};
+
+int main() {
+    copy_constructor obj1(10);
+    copy_constructor obj2 = obj1; // User-defined copy constructor
+
+    obj1.display();
+    obj2.display();
+
+    return 0;
+}
+/*
+Explanation
+User-Defined Copy Constructor:
+The copy constructor is defined as copy_constructor(const copy_constructor& source). It takes a reference to an object of the same class as a parameter
+. In this example, the copy constructor allocates new memory for data and copies the value from the source object’s data to the new memory location. 
+This ensures that each object has its own copy of the data, preventing unintended side effects.
+When is the Copy Constructor Called?:
+The copy constructor is called in the following scenarios:
+When an object is initialized from another object of the same type (e.g., Example obj2 = obj1;).
+When an object is passed by value to a function.
+When an object is returned by value from a function.
+*/
+
