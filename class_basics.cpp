@@ -123,3 +123,42 @@ When an object is passed by value to a function.
 When an object is returned by value from a function.
 */
 
+
+/*
+Delegating Constructor in C++ 11:
+A delegating constructor in C++11 allows one constructor to call another constructor within the same class. 
+This feature helps reduce code duplication and makes the code more maintainable by centralizing common initialization logic.
+Example of a Delegating Constructor
+Here’s an example to illustrate how delegating constructors work:
+*/
+class delegating_constructor {
+private:
+    int value;
+    int extra;
+
+public:
+    // Target constructor
+    delegating_constructor(int val) : value{val}, extra{0} {
+        cout << "Constructor with one parameter called!" << endl;
+    }
+
+    // Delegating constructor
+    delegating_constructor(int val, int ext) : delegating_constructor(val) {
+        extra = ext;
+        cout << "Constructor with two parameters called!" << endl;
+    }
+
+    void display() const {
+        cout << "Value: " << value << ", Extra: " << extra << endl;
+    }
+};
+
+int delegating_main() {
+    delegating_constructor obj1(10);
+    delegating_constructor obj2(20, 30);
+
+    obj1.display();
+    obj2.display();
+
+    return 0;
+}
