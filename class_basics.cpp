@@ -162,3 +162,31 @@ int delegating_main() {
 
     return 0;
 }
+/*
+Default Keyword:
+The default keyword is used to explicitly specify that the compiler 
+should generate the default implementation for a special member function. 
+This is useful when you want to ensure that the default behavior is used, even if other constructors or member functions are defined.
+*/
+class default_demo {
+public:
+    default_demo() = default;  // Use the default constructor
+    default_demo(const default_demo&) = default;  // Use the default copy constructor
+    default_demo& operator=(const default_demo&) = default;  // Use the default copy assignment operator
+    ~default_demo() = default;  // Use the default destructor
+};
+
+/*
+delete Keyword
+The delete keyword is used to explicitly disable a function.
+This is particularly useful for preventing the use of certain functions that 
+the compiler would otherwise generate automatically, such as copy constructors or assignment operators.
+By using delete, you can prevent objects of your class from being copied or assigned, 
+which can help avoid unintended behavior and potential bugs
+*/
+class default_delete {
+public:
+    default_delete() = default;
+    default_delete(const default_delete&) = delete;  // Disable copy constructor
+    default_delete& operator=(const default_delete&) = delete;  // Disable copy assignment operator
+};
