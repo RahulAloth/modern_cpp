@@ -1,11 +1,11 @@
 L-Value                                             |      R-Value
 .............................................................................................................
-L-Value has a name	                                |      R-Value does not have a name
-All variables are l-values	                        |      R-Value is a temporary value
+L-Value has a name	                            |      R-Value does not have a name
+All variables are l-values	                    |      R-Value is a temporary value
 Can be assigned values	                            |      R-Value cannot be assigned values
-Some expressions return l-values	                  |      Some expressions return r-values
+Some expressions return l-values	            |      Some expressions return r-values
 L-Value persists beyond the expression	            |      R-Value does not persist beyond the expression
-Functions that return by reference return l-values	|      Functions that return by value return r-values
+Functions that return by reference return l-values  |      Functions that return by value return r-values
 Reference to l-value (called l-value reference)	    |      Reference to r-value (called r-value reference)
 .............................................................................................................
 
