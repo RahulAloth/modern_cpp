@@ -171,4 +171,59 @@ int user_main() {
 }
 
 
+/*
+The Interface Segregation Principle(ISP) is one of the SOLID principles of object 
+- oriented design.It states that clients should not be forced to depend on interfaces 
+they do not use.This means that larger interfaces should be split into smaller, more
+specific ones so that implementing classes only need to be concerned with the methods that are of interest to them.
+*/
+// Separate interfaces for different functionalities
+class IPrinter {
+public:
+    virtual void print() = 0;
+};
 
+class IScanner {
+public:
+    virtual void scan() = 0;
+};
+
+// A class that only needs to print
+class Printer : public IPrinter {
+public:
+    void print() override {
+        cout << "Printing document..." << endl;
+    }
+};
+
+// A class that only needs to scan
+class Scanner : public IScanner {
+public:
+    void scan() override {
+        cout << "Scanning document..." << endl;
+    }
+};
+
+// A class that needs both printing and scanning functionalities
+class MultiFunctionPrinter : public IPrinter, public IScanner {
+public:
+    void print() override {
+        cout << "Printing document..." << endl;
+    }
+    void scan() override {
+        cout << "Scanning document..." << endl;
+    }
+};
+
+int isp_main() {
+    Printer printer;
+    Scanner scanner;
+    MultiFunctionPrinter mfp;
+
+    printer.print();
+    scanner.scan();
+    mfp.print();
+    mfp.scan();
+
+    return 0;
+}
