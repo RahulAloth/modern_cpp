@@ -276,3 +276,51 @@ int dip_main() {
     app.stop();
     return 0;
 }
+/*
+The Rule of Zero in C++ suggests that classes should rely on automatic resource management 
+and avoid defining custom destructors, copy/move constructors, or copy/move assignment operators.
+This is achieved by using standard library facilities like smart pointers and containers,
+which manage resources automatically.
+
+In this example:
+
+The Person class is a simple data holder with no custom resource management.
+The Team class uses std::shared_ptr to manage Person objects, ensuring proper memory management without needing custom destructors or copy/move operations.
+By following the Rule of Zero, the code is simpler, safer, and easier to maintain
+*/
+
+class Person {
+public:
+    std::string name;
+    int age;
+
+    Person(const std::string& name, int age) : name(name), age(age) {}
+};
+
+class Team {
+private:
+    std::vector<std::shared_ptr<Person>> members;
+public:
+    void addMember(const std::shared_ptr<Person>& person) {
+        members.push_back(person);
+    }
+
+    void showMembers() const {
+        for (const auto& member : members) {
+            std::cout << member->name << " (" << member->age << " years old)" << std::endl;
+        }
+    }
+};
+
+int zero_main() {
+    auto person1 = std::make_shared<Person>("Alice", 30);
+    auto person2 = std::make_shared<Person>("Bob", 25);
+
+    Team team;
+    team.addMember(person1);
+    team.addMember(person2);
+
+    team.showMembers();
+
+    return 0;
+}
