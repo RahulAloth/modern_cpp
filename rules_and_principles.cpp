@@ -324,3 +324,56 @@ int zero_main() {
 
     return 0;
 }
+/*
+The Rule of Three in C++ is a guideline that suggests if a class requires a user-defined destructor,
+copy constructor, or copy assignment operator, it likely needs all three.
+This rule helps manage resources properly and avoid issues like double deletion or resource leaks.
+*/
+class MyString {
+private:
+    char* data;
+public:
+    // Constructor
+    MyString(const char* str = "") {
+        data = new char[strlen(str) + 1];
+        strcpy(data, str);
+    }
+
+    // Destructor
+    ~MyString() {
+        delete[] data;
+    }
+
+    // Copy Constructor
+    MyString(const MyString& other) {
+        data = new char[strlen(other.data) + 1];
+        strcpy(data, other.data);
+    }
+
+    // Copy Assignment Operator
+    MyString& operator=(const MyString& other) {
+        if (this == &other) return *this; // Self-assignment check
+
+        delete[] data; // Free existing resource
+        data = new char[strlen(other.data) + 1];
+        strcpy(data, other.data);
+        return *this;
+    }
+
+    void print() const {
+        std::cout << data << std::endl;
+    }
+};
+
+int rule_3_main() {
+    MyString str1("Hello");
+    MyString str2 = str1; // Copy constructor
+    MyString str3;
+    str3 = str1; // Copy assignment operator
+
+    str1.print();
+    str2.print();
+    str3.print();
+
+    return 0;
+}
