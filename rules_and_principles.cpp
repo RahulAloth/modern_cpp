@@ -130,3 +130,45 @@ int open_close_main_ext() {
 
     return 0;
 }
+
+/*
+Single Responsibility Principle (SRP):
+
+A class should have only one reason to change, meaning it should have only one job or responsibility.
+Idea is simple, in the below example, instead of having one classfor user and doing file operation, we create two seperate clases.
+Here, the User class is only responsible for managing user data, while the UserFileManager class is responsible for file operations. 
+This way, each class has a single responsibility, adhering to the Single Responsibility Principle.
+*/
+class User {
+private:
+    std::string name;
+    int age;
+public:
+    User(const std::string& name, int age) : name(name), age(age) {}
+
+    std::string getName() const { return name; }
+    int getAge() const { return age; }
+};
+
+class UserFileManager {
+public:
+    void saveToFile(const User& user, const std::string& filename) const {
+        std::ofstream file(filename);
+        if (file.is_open()) {
+            file << "Name: " << user.getName() << "\n";
+            file << "Age: " << user.getAge() << "\n";
+            file.close();
+        }
+    }
+};
+
+int user_main() {
+    User user("Alice", 30);
+    UserFileManager fileManager;
+    fileManager.saveToFile(user, "user.txt");
+
+    return 0;
+}
+
+
+
