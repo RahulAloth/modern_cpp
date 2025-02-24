@@ -10,6 +10,7 @@ Reference to l-value (called l-value reference)	    |      Reference to r-value 
 .............................................................................................................
 
 #include <iostream>
+#include <utility> // for std::move
 
 //Returns r-value
 int addition(int x, int y) {
@@ -53,4 +54,68 @@ int main() {
 	print(5);
 	return 0;
 }
+/*
+ Move semantics in C++ is a feature introduced in C++11 that allows the resources owned by temporary objects to be moved rather than copied.
+ Copy Constructor: Creates a deep copy of the array.
+ Move Constructor: Transfers ownership of the array from the source object to the new object, leaving the source in a valid but empty state.
+ Move Assignment Operator: Transfers ownership of the array from the source object to the current object, leaving the source in a valid but empty state.
+ Move semantics are particularly useful when dealing with temporary objects that are about to be destroyed, as they allow the efficient 
+ transfer of resources without the overhead of copying.
 
+*/
+
+class DynamicArray {
+private:
+    int* data;
+    size_t size;
+
+public:
+    // Constructor
+    DynamicArray(size_t size) : size(size), data(new int[size]) {
+        std::cout << "Constructing DynamicArray\n";
+    }
+
+    // Destructor
+    ~DynamicArray() {
+        delete[] data;
+        std::cout << "Destructing DynamicArray\n";
+    }
+
+    // Copy Constructor
+    DynamicArray(const DynamicArray& other) : size(other.size), data(new int[other.size]) {
+        std::copy(other.data, other.data + other.size, data);
+        std::cout << "Copy Constructing DynamicArray\n";
+    }
+
+    // Move Constructor
+    DynamicArray(DynamicArray&& other) noexcept : size(other.size), data(other.data) {
+        other.size = 0;
+        other.data = nullptr;
+        std::cout << "Move Constructing DynamicArray\n";
+    }
+
+    // Copy Assignment Operator
+    DynamicArray& operator=(const DynamicArray& other) {
+        if (this == &other) return *this;
+
+        delete[] data;
+        size = other.size;
+        data = new int[other.size];
+        std::copy(other.data, other.data + other.size, data);
+        std::cout << "Copy Assigning DynamicArray\n";
+        return *this;
+    }
+
+    // Move Assignment Operator
+    DynamicArray& operator=(DynamicArray&& other) noexcept {
+        if (this == &other) return *this;
+
+        delete[] data;
+        size = other.size;
+        data = other.data;
+        other.size = 0;
+        other.data = nullptr;
+        std::cout << "Move Assigning DynamicArray\n";
+        return *this;
+    }
+};
