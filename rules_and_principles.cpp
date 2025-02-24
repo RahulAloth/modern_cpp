@@ -227,3 +227,52 @@ int isp_main() {
 
     return 0;
 }
+/*
+The Dependency Inversion Principle (DIP) is another one of the SOLID principles.
+It states that high-level modules should not depend on low-level modules. 
+Both should depend on abstractions. Additionally, abstractions should not depend on details. 
+Details should depend on abstractions.
+Example:
+*/
+// Abstract interface for a database
+class IDatabase {
+public:
+    virtual void connect() = 0;
+    virtual void disconnect() = 0;
+    virtual ~IDatabase() = default;
+};
+
+// Concrete implementation of a database
+class MySQLDatabase : public IDatabase {
+public:
+    void connect() override {
+        cout << "Connecting to MySQL database..." << endl;
+    }
+    void disconnect() override {
+        cout << "Disconnecting from MySQL database..." << endl;
+    }
+};
+
+// High-level module that depends on the abstract interface
+class Application {
+private:
+    shared_ptr<IDatabase> database;
+public:
+    Application(shared_ptr<IDatabase> db) : database(db) {}
+    void start() {
+        database->connect();
+        cout << "Application started." << endl;
+    }
+    void stop() {
+        database->disconnect();
+        cout << "Application stopped." << endl;
+    }
+};
+
+int dip_main() {
+    shared_ptr<IDatabase> db = make_shared<MySQLDatabase>();
+    Application app(db);
+    app.start();
+    app.stop();
+    return 0;
+}
