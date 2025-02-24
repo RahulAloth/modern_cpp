@@ -13,6 +13,7 @@ Example:
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 
 class Bird {
 public:
@@ -374,6 +375,82 @@ int rule_3_main() {
     str1.print();
     str2.print();
     str3.print();
+
+    return 0;
+}
+/*
+The Rule of Five in C++ is an extension of the Rule of Three.
+It states that if a class requires a user-defined destructor, copy constructor,
+or copy assignment operator, it likely also needs a user-defined move constructor
+and move assignment operator. This rule helps manage resources efficiently, especially when dealing with dynamic memory or other resources.
+*/
+class Resource {
+private:
+    int* data;
+public:
+    // Constructor
+    Resource(int value) : data(new int(value)) {
+        std::cout << "Resource acquired\n";
+    }
+
+    // Destructor
+    ~Resource() {
+        delete data;
+        std::cout << "Resource destroyed\n";
+    }
+
+    // Copy Constructor
+    Resource(const Resource& other) : data(new int(*other.data)) {
+        std::cout << "Resource copied\n";
+    }
+
+    // Copy Assignment Operator
+    Resource& operator=(const Resource& other) {
+        if (this == &other) return *this; // Self-assignment check
+        delete data;
+        data = new int(*other.data);
+        std::cout << "Resource assigned\n";
+        return *this;
+    }
+
+    // Move Constructor
+    Resource(Resource&& other) noexcept : data(other.data) {
+        other.data = nullptr;
+        std::cout << "Resource moved\n";
+    }
+
+    // Move Assignment Operator
+    Resource& operator=(Resource&& other) noexcept {
+        if (this == &other) return *this; // Self-assignment check
+        delete data;
+        data = other.data;
+        other.data = nullptr;
+        std::cout << "Resource move-assigned\n";
+        return *this;
+    }
+
+    void print() const {
+        if (data) {
+            std::cout << "Resource value: " << *data << std::endl;
+        } else {
+            std::cout << "Resource is empty\n";
+        }
+    }
+};
+
+int rule_5_main() {
+    Resource res1(10);
+    Resource res2 = res1; // Copy constructor
+    Resource res3(20);
+    res3 = res1; // Copy assignment operator
+
+    Resource res4 = std::move(res1); // Move constructor
+    Resource res5(30);
+    res5 = std::move(res3); // Move assignment operator
+
+    res2.print();
+    res4.print();
+    res5.print();
 
     return 0;
 }
