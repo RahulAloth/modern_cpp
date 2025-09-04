@@ -15,14 +15,14 @@ Memory leaks (if delete is forgotten)
 
 Dangling pointers (if memory is deleted but pointer is still used)
 Exception safety issues
-
-Feature	            | Raw Pointer	   | Smart Pointer (unique_ptr, shared_ptr)
-_____________________________________________________________________________
-Manual memory mgmt	| ✅ Yes	       | ❌ No (automatic)
-RAII compliant	    | ❌ No	         | ✅ Yes
-Exception safe	    | ❌ No	         | ✅ Yes
-Ownership clarity	  | ❌ No	         | ✅ Yes
-______________________________________________________________________________
+_______________________________________________________________________________
+Feature	              | Raw Pointer	   | Smart Pointer (unique_ptr, shared_ptr) 
+_______________________________________________________________________________
+Manual memory mgmt	  | ✅ Yes	       | ❌ No (automatic)
+RAII compliant	      | ❌ No	       | ✅ Yes
+Exception safe	      | ❌ No	       | ✅ Yes
+Ownership clarity	  | ❌ No	       | ✅ Yes
+________________________________________________________________________________
 */
 
 #include <iostream>
