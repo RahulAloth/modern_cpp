@@ -44,3 +44,86 @@ int main() {
     
     return 0;
 }
+#include <iostream>
+#include <memory>
+
+int main() {
+    // Allocate an array of 5 integers on the heap
+    std::unique_ptr<int[]> arr = std::make_unique<int[]>(5);
+
+    // Initialize and print the array
+    for (int i = 0; i < 5; ++i) {
+        arr[i] = i * 10;
+        std::cout << arr[i] << " ";
+    }
+    std::cout << "\n";
+
+    // No need to manually delete the array
+    // It will be automatically deallocated when arr goes out of scope
+}
+
+/*Important points to consider:
+std::unique_ptr<int[]> is used for arrays (note the []).
+std::make_unique<int[]>(size) is the preferred way to allocate.
+Automatically deallocates memory when it goes out of scope.
+Safer than raw pointers—no risk of forgetting delete[].
+Dynamic Memory Allocation: 
+
+*/
+#include <iostream>
+#include <memory>
+
+int main() {
+    // Create a dynamic array of 10 integers
+    std::unique_ptr<int[]> arr = std::make_unique<int[]>(10);
+
+    // Initialize the array
+    for (int i = 0; i < 10; ++i) {
+        arr[i] = i * 5;
+    }
+
+    // Print the array
+    for (int i = 0; i < 10; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << "\n";
+
+    // No need to manually delete the array
+    // Memory is automatically released when arr goes out of scope
+}
+// But, Using std::vector is often the best way to manage dynamic arrays in C++ 
+// because it handles memory allocation, resizing, and cleanup automatically. 
+// It’s safer, more flexible, and more idiomatic than using raw pointers or even smart pointers for arrays.
+
+
+#include <iostream>
+#include <vector>
+
+int main() {
+    // Create a dynamic array of 10 integers
+    std::vector<int> numbers(10);
+
+    // Initialize the array
+    for (int i = 0; i < numbers.size(); ++i) {
+        numbers[i] = i * 5;
+    }
+
+    // Print the array
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << "\n";
+
+    // Automatically deallocated when vector goes out of scope
+}
+/*
+Why std::vector is Preferred
+________________________________________________________________________________________
+Feature	                    | std::vector	    | unique_ptr<int[]>	    | Raw Pointer (int*)
+_______________________________________________________________________________________
+Automatic memory cleanup	| ✅ Yes	        | ✅ Yes	            | ❌ No
+Bounds checking	            | ⚠️ With .at()	    | ❌ No	                | ❌ No
+Resizing support	        | ✅ Yes	        | ❌ No	                | ❌ No
+Exception safety	        | ✅ High	        | ✅ Medium	            | ❌ Low
+STL compatibility	        | ✅ Yes	        | ❌ No	                | ❌ No
+*/
