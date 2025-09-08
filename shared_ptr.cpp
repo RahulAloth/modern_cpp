@@ -48,5 +48,60 @@ Overhead: Slightly more memory and performance overhead due to reference countin
 Not Thread-Safe for Object Access: While reference counting is thread-safe, access to the object itself is not.
 */
 
+an use std::shared_ptr to manage a dynamic array, but it's a bit less straightforward than with unique_ptr or std::vector. Here's how you can do it properly:
+#include <iostream>
+#include <memory>
 
+int main() {
+    // Create a shared_ptr managing a dynamic array of 5 integers
+    std::shared_ptr<int[]> arr(new int[5], std::default_delete<int[]>());
+
+    // Initialize the array
+    for (int i = 0; i < 5; ++i) {
+        arr[i] = i * 10;
+    }
+
+    // Print the array
+    for (int i = 0; i < 5; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << "\n";
+
+    // Memory is automatically released when the last shared_ptr goes out of scope
+}
+/*
+std::shared_ptr<int[]> is used for arrays.
+You must provide a custom deleter: std::default_delete<int[]> to ensure delete[] is called.
+Unlike unique_ptr, shared_ptr does not have built-in support for arrays, so this extra step is necessary.
+*/
+
+/* std::vector is Better Than shared_ptr<T[]> for Dynamic Arrays
+________________________________________________________________________
+Feature	                    |  std::vector<T>	| std::shared_ptr<T[]>
+________________________________________________________________________
+Automatic memory management	|  ✅ Yes	        | ✅ Yes
+Dynamic resizing	           |  ✅ Yes	        | ❌ No
+Bounds checking	            |  ✅ With .at()	| ❌ No
+STL compatibility	          |  ✅ Full	       | ❌ Limited
+Simpler syntax	             |  ✅ Yes	        | ❌ Requires custom deleter
+Safer and more idiomatic  	 | ✅ Yes	         | ⚠️ Only when shared ownership is needed
+________________________________________________________________________________
+*/
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> data(5); // dynamic array of 5 ints
+
+    for (int i = 0; i < data.size(); ++i) {
+        data[i] = i * 10;
+    }
+
+    for (int value : data) {
+        std::cout << value << " ";
+    }
+    std::cout << "\n";
+
+    // Automatically deallocated when vector goes out of scope
+}
 
