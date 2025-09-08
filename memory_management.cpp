@@ -170,3 +170,146 @@ int dynamic_memory_allocation_new() {
 
     return 0;
 }
+/*
+Effective memory management is crucial for writing robust, efficient, and leak-free applications, especially in languages like C++ that give you
+direct control over memory. Here are some best practices for memory management:
+🔹 1. Use Smart Pointers
+Prefer smart pointers over raw pointers:
+
+std::unique_ptr: for sole ownership.
+std::shared_ptr: for shared ownership.
+std::weak_ptr: to break circular references in shared ownership.
+These automatically manage memory and reduce the risk of leaks.
+🔹 2. Avoid Manual new and delete
+Use smart pointers or container classes (like std::vector, std::string) instead of manually allocating and deallocating memory.
+🔹 3. Break Circular References
+As discussed earlier, use std::weak_ptr to break cycles in std::shared_ptr graphs.
+🔹 4. RAII (Resource Acquisition Is Initialization)
+Encapsulate resource management in objects whose lifetimes are tied to scope:
+RAII (Resource Acquisition Is Initialization) is a fundamental C++ programming idiom that ensures resource safety by tying the lifetime of 
+a resource (like memory, file handles, sockets, etc.) to the lifetime of an object.
+
+🔑 Key Idea:
+When an object is created, it acquires a resource in its constructor, and when the object goes out of scope, its destructor 
+releases the resource automatically.
+Prevents resource leaks
+Simplifies exception safety
+Makes code cleaner and more maintainable
+*/
+
+#include <iostream>
+class ScopedArray {
+private:
+    int* data;
+    size_t size;
+
+public:
+    // Constructor acquires the resource
+    ScopedArray(size_t n) : size(n) {
+        data = new int[n];
+        std::cout << "Allocated array of size " << size << "\n";
+    }
+
+    // Destructor releases the resource
+    ~ScopedArray() {
+        delete[] data;
+        std::cout << "Deallocated array\n";
+    }
+
+    // Accessor
+    int& operator[](size_t indexrn data[index];
+    }
+
+    // Prevent copying (to avoid double deletion)
+    ScopedArray(const ScopedArray&) = delete;
+    ScopedArray& operator=(const ScopedArray&) = delete;
+
+    // Allow move semantics
+    ScopedArray(ScopedArray&& other) noexcept : data(other.data), size(other.size) {
+        other.data = nullptr;
+        other.size = 0;
+    }
+
+    ScopedArray& operator=(ScopedArray&& other) noexcept {
+        if (this != &other) {
+            delete[] data;
+            data = other.data;
+            size = other.size;
+            other.data = nullptr;
+            other.size = 0;
+        }
+        return *this;
+    }
+};
+int main() {
+    ScopedArray arr(5);
+    for (size_t i = 0; i < 5; ++i) {
+        arr[i] = static_cast<int>(i * 10);
+    }
+
+    for (size_t i = 0; i < 5; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << "\n";
+
+    // No need to manually delete the array
+    // Destructor will be called automatically
+}
+
+/*
+Constructor acquires the resource (new int[n])
+Destructor releases it (delete[])
+Copying is disabled to prevent accidental double deletion
+Move semantics are supported for safe transfers
+Would you like a RAII example for something more advanced, like file handles, mutex locks, or sockets?
+
+C++
+std::ifstream file("data.txt"); // Automatically closes when out of scope
+🔹 5. Use Containers Wisely
+Standard containers like std::vector, std::map, and std::list manage memory internally and are safer than raw arrays or manual memory management.
+🔹 6. Avoid Memory Leaks
+Use tools like:
+Valgrind (Linux)
+Visual Studio Diagnostics Tools
+AddressSanitizer
+These help detect leaks and invalid memory access.
+🔹 7. Minimize Heap Allocations
+Prefer stack allocation when possible. Heap allocations are slower and more error-prone.
+*/
+
+// Heap allocation.
+#include <iostream>
+
+void heapExample() {
+    int* numbers = new int[5]; // Allocated on the heap
+
+    for (int i = 0; i < 5; ++i) {
+        numbers[i] = i * 10;
+        std::cout << numbers[i] << " ";
+    }
+    std::cout << "\n";
+
+    delete[] numbers; // Must manually deallocate
+}
+// Stack Allocation.
+#include <iostream>
+
+void stackExample() {
+    int numbers[5]; // Allocated on the stack
+
+    for (int i = 0; i < 5; ++i) {
+        numbers[i] = i * 10;
+        std::cout << numbers[i] << " ";
+    }
+    std::cout << "\n";
+
+    // Automatically deallocated when function ends
+}
+/*
+🔹 8. Be Mindful of Object Lifetimes
+Ensure that objects are not accessed after they are destroyed. This is especially important when using raw pointers or references.
+🔹 9. Use Move Semantics
+Use std::move to transfer ownership efficiently and avoid unnecessary copies.
+🔹 10. Initialize All Variables
+Uninitialized memory can lead to undefined behavior. Always initialize variables, especially pointers.
+*/
