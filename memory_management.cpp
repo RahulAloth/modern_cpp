@@ -313,3 +313,24 @@ Use std::move to transfer ownership efficiently and avoid unnecessary copies.
 🔹 10. Initialize All Variables
 Uninitialized memory can lead to undefined behavior. Always initialize variables, especially pointers.
 */
+
+/*Make functions:
+The make functions in C++ — like std::make_unique, std::make_shared, and indirectly std::weak_ptr via std::make_shared — are factory functions that simplify and improve memory management. Here's a breakdown:
+std::make_unique<T>() : Ownership Exclusive
+Creates a std::unique_ptr<T> and returns it. It's safer and more efficient than manually using new.
+*/
+auto ptr = std::make_unique<int>(42); // unique_ptr to int
+auto arr = std::make_unique<int[]>(5); // unique_ptr to array of 5 ints
+std::make_shared<T>() : Ownership Shared
+/*
+Creates a std::shared_ptr<T> and returns it. It allocates both the object and the control block in a single memory allocation (more efficient).
+*/
+
+auto ptr = std::make_shared<int>(42); // shared_ptr to int
+/*
+std::weak_ptr<T>  : Ownership None.
+There is no make_weak function because std::weak_ptr does not own memory. Instead, you create a weak_ptr from a shared_ptr:
+*/
+std::shared_ptr<int> shared = std::make_shared<int>(100);
+std::weak_ptr<int> weak = shared; // observes shared, doesn't own
+
