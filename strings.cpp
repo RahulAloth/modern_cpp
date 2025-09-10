@@ -1,3 +1,7 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+
 /*Raw String Literals
 Raw string literals were introduced in C++11 to make it easier to write strings that contain characters like backslashes (\) or quotes (") without needing to escape them.
 Avoid escaping characters	
@@ -56,4 +60,51 @@ std::string input = "123 456";
 std::stringstream ss(input);
 int a, b;
 ss >> a >> b; // a = 123, b = 456
+
+/*
+std::stringstream – Read and Write
+Used for both input and output operations on strings.
+*/
+int main() {
+    std::stringstream ss;
+    ss << "Aloth Rajan " << 2025;
+
+    std::string name;
+    int year;
+    ss >> name >> year;
+
+    std::cout << "Name: " << name << ", Year: " << year << std::endl;
+}
+
+/*
+std::istringstream – Input Only
+Used to parse a string (like reading from a file or user input).
+*/
+int main() {
+    std::string data = "42 3.14 Rahul";
+    std::istringstream iss(data);
+
+    int i;
+    double d;
+    std::string name;
+
+    iss >> i >> d >> name;
+
+    std::cout << "Int: " << i << ", Double: " << d << ", Name: " << name << std::endl;
+}
+/*
+std::ostringstream – Output Only
+Used to build a string using stream operations.
+*/
+int main_ostring() {
+    std::ostringstream oss;
+    int age = 30;
+    std::string name = "Aloth";
+
+    oss << "Name: " << name << ", Age: " << age;
+
+    std::string result = oss.str();
+    std::cout << result << std::endl;
+}
+
 
