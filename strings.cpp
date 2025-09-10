@@ -65,7 +65,7 @@ ss >> a >> b; // a = 123, b = 456
 std::stringstream – Read and Write
 Used for both input and output operations on strings.
 */
-int main() {
+int main_stringstream() {
     std::stringstream ss;
     ss << "Aloth Rajan " << 2025;
 
@@ -80,7 +80,7 @@ int main() {
 std::istringstream – Input Only
 Used to parse a string (like reading from a file or user input).
 */
-int main() {
+int main_istring() {
     std::string data = "42 3.14 Rahul";
     std::istringstream iss(data);
 
