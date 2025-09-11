@@ -48,7 +48,7 @@ reset(): Clears the weak_ptr.
 In GUI frameworks or event systems, listeners often hold weak_ptrs to avoid keeping objects alive unnecessarily.
 
 // CIRCULAR REFERENCE:
-*/
+
 A shared pointer circular reference occurs in C++ when two or more std::shared_ptr instances reference each other in a cycle, 
 preventing their reference counts from ever reaching zero. This causes a memory leak, because the objects involved in the cycle are never destroyed.
 */
