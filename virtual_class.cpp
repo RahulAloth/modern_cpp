@@ -252,6 +252,27 @@ int main() {
     SmartCam sc;
     sc.info(); // "SmartCam Device"
 }
-
-
-
+Bissal = a little
+Sagen lassen = Let them say.
+Ermutigen = Encourage
+Zubuchen = add -on
+Steuerberater = Tax advicer
+Durch = Through
+Pauschal= flat-rate,” “general,” or “all-inclusive
+Besorgen = Obtain
+Betrieb = Operation
+Betrifft = regards
+Ausnahme = Exception
+Mittlerweile = In the mean time
+Bissal = a little
+beachten sie = Please note.
+Empfehlungen = Recomendations.
+inhaltlich = content related / Regarding Content. 
+Kneipe = Pub or Bar 
+Sprühen = To Spray
+häufig = Frequent
+Hinstellen = to put down, to place, or to stand something up
+Deutlich = clear, distinct, or obvious
+Abgeben = to hand in, to submit, or to give away
+Verliebt = in love
+Erledigt = done, Completed or finished.
