@@ -108,3 +108,118 @@ int main() {
     }
 }
 
+/*
+A nested exception occurs when an exception is thrown while another exception is already being handled.
+In C++, this is supported via the <exception> header, specifically with:
+    std::nested_exception
+    std::throw_with_nested
+    std::rethrow_if_nested
+This mechanism lets you chain exceptions together so you don’t lose the original cause when rethrowing or wrapping errors.
+*/
+#include <exception>
+#include <stdexcept>
+
+void lowLevel() {
+    throw std::runtime_error("Low-level failure");
+}
+
+void midLevel() {
+    try {
+        lowLevel();
+    } catch (...) {
+        // Wrap the caught exception with a new one
+        std::throw_with_nested(std::logic_error("Mid-level logic error"));
+    }
+}
+// Catching and rethrowing nested exceptions
+void handle(const std::exception& e) {
+    std::cerr << "Caught: " << e.what() << "\n";
+    try {
+        std::rethrow_if_nested(e);
+    } catch (const std::exception& nested) {
+        handle(nested); // recursive handling
+    }
+}
+
+int main() {
+    try {
+        midLevel();
+    } catch (const std::exception& e) {
+        handle(e);
+    }
+}
+/*
+Constructor - Destructor Exception Safety
+In C++, constructors and destructors should ideally not throw exceptions.
+If a constructor throws, the object is not created, and its destructor is not called.
+If a destructor throws during stack unwinding (when another exception is active), it can lead to
+ program termination via std::terminate.
+To ensure safety:
+    Constructors should handle errors internally or use exceptions judiciously.
+    Destructors should avoid throwing exceptions; if necessary, catch and log errors instead.
+*/
+#include <iostream>
+#include <stdexcept>
+using namespace std;
+class Resource {
+public:
+    Resource() {
+        if (!initHardware()) {
+            throw std::runtime_error("Failed to initialize hardware");
+        }
+    }
+    ~Resource() {
+        try {
+            releaseHardware();
+        } catch (...) {
+            // Log the error, but do not throw
+            cerr << "Error releasing hardware in destructor" << endl;
+        }
+    }
+private:
+    bool initHardware() {
+        // Simulate failure
+        return false;
+    }
+    void releaseHardware() {
+        // Simulate potential error during release
+        throw std::runtime_error("Release failed");
+    }
+};
+
+/*
+No except Specifier
+In C++, the noexcept specifier indicates that a function is guaranteed not to throw exceptions.
+Using noexcept can help the compiler optimize code and provides better guarantees about function behavior.
+If a noexcept function does throw, std::terminate is called.
+Usage:
+    void func() noexcept {
+        // function body
+    }
+Benefits:
+    Optimization: The compiler can make optimizations knowing the function won't throw.
+    Clarity: It signals to users that the function is safe from exceptions.     
+*/
+#include <iostream>
+using namespace std;
+void safeFunction() noexcept {
+    cout << "This function will not throw exceptions." << endl;
+}   
+int main() {
+    safeFunction();
+    return 0;
+}   
+// Example of a noexcept function that throws
+#include <iostream>
+using namespace std;
+void riskyFunction() noexcept {
+    throw runtime_error("This will cause terminate!");
+}
+int main() {
+    try {
+        riskyFunction();
+    } catch (...) {
+        cout << "Caught an exception!" << endl;
+    }
+    return 0;
+}   
