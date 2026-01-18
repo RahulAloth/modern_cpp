@@ -78,4 +78,13 @@ Avoid passing overlapping pointers
 */
 foo(&arr[0], &arr[1]); // Bad: aliasing risk
 foo(arrA, arrB); // Good: independent arrays
+/*
+## Summary (for your notes)
 
+| Concept            | Meaning                               | Performance Impact                       |
+|--------------------|----------------------------------------|-----------------------------------------|
+| Pointer aliasing   | Two pointers refer to the same memory  | Prevents optimization                   |
+| Compiler behavior  | Must assume worst-case aliasing        | No vectorization, no reordering         |
+| Avoiding aliasing  | `restrict`, SoA, separate arrays       | Big speedups                            |
+| Jetson relevance   | Critical for NEON + CUDA preprocessing | 2×–10× faster loops                     |
+*/
