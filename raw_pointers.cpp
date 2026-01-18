@@ -44,3 +44,38 @@ int main_raw() {
     rawPointerExample();             // Call the function here
     return 0;
 }
+# Pointer Aliasing:
+/*
+Pointer Aliasing
+A foundational concept for optimization, vectorization, and predictable performance
+🌱 What is pointer aliasing?
+Pointer aliasing happens when two or more pointers refer to the same memory location (or overlapping regions).
+*/
+void foo(float* a, float* b) {
+    *a = *a + 1;
+    *b = *a + 2;   // Compiler must assume a and b might alias
+}
+
+/*
+🧠 How to avoid aliasing penalties
+1. Use restrict (C99)
+
+This tells the compiler:
+“These pointers never alias. Optimize freely.”
+
+Huge win for NEON vectorization.
+
+*/
+
+void foo(float* __restrict a, float* __restrict b) { 
+    *a = *a + 1;
+    *b = *a + 2;   // Compiler must assume a and b might alias
+}
+
+
+/*
+Avoid passing overlapping pointers
+*/
+foo(&arr[0], &arr[1]); // Bad: aliasing risk
+foo(arrA, arrB); // Good: independent arrays
+
