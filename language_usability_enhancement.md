@@ -142,7 +142,7 @@ C++20 effectively blurs the line between compile time and runtime.
 
 ---
 #### Examples 
-- [`ptr_const_auto.cpp`](modern_cpp/const_expr.cpp)
+- [`const_expr.cpp`](modern_cpp/const_expr.cpp)
 
 # User‑Defined Literals (UDLs)
 
@@ -172,4 +172,66 @@ UDLs reduce boilerplate and improve readability.
 ## How UDLs Work
 
 A user‑defined literal is triggered when a literal is followed by a custom suffix:
+
+````
+42_km
+"hello"_json
+3.14_rad
+````
+
+The compiler transforms these into calls to literal operator functions.
+
+### Categories of UDL operators
+1. **Integer literals**  
+   `operator"" _suffix(unsigned long long)`
+2. **Floating‑point literals**  
+   `operator"" _suffix(long double)`
+3. **Character literals**  
+   `operator"" _suffix(char)`
+4. **String literals**  
+   `operator"" _suffix(const char*, size_t)`
+5. **Raw literal operators**  
+   For custom parsing of the literal text
+
+---
+
+## Why UDLs Matter
+
+### Expressiveness
+UDLs let code read like the domain it models.
+
+### Safety
+Strong types replace raw integers and strings.
+
+### Zero‑cost abstractions
+UDLs are resolved at compile time and optimized away.
+
+### Domain‑specific languages (DSLs)
+C++ can embed small DSLs directly in code:
+- Chrono literals (`10ms`, `2h`)
+- Filesystem literals (`"path"_p`)
+- String‑view literals (`"text"sv`)
+
+### Readability
+Compare:
+
+Duration d = Duration::from_seconds(60);
+
+vs.
+
+auto d = 60s;
+
+The second is clearer and harder to misuse.
+
+---
+
+## Summary of UDL Theory
+
+| Concept | Explanation |
+|--------|-------------|
+| Purpose | Extend literals with semantic meaning |
+| Benefit | Expressive, safe, domain‑specific code |
+| Mechanism | Compiler transforms literal + suffix into a function call |
+| Use cases | Units, time, memory, parsing, strong types |
+| Cost | Zero runtime overhead |
 
