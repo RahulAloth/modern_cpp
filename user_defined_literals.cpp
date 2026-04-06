@@ -40,6 +40,17 @@
 
 //
 // -----------------------------------------------------------------------------
+// 7. Standard Library UDLs
+// -----------------------------------------------------------------------------
+
+using namespace std::chrono_literals;       // 10s, 500ms, 2h
+using namespace std::string_literals;       // "hello"s
+using namespace std::string_view_literals;  // "hello"sv
+using namespace std::complex_literals;      // 3.0i
+using namespace std::filesystem;            // "path"_p
+
+//
+// -----------------------------------------------------------------------------
 // 1. Floating-Point Unit Literals (_km, _m)
 // -----------------------------------------------------------------------------
 
@@ -96,39 +107,41 @@ constexpr std::string operator"" _s() {
     return std::string{Chars...};
 }
 
-//
-// -----------------------------------------------------------------------------
-// 6. Binary Literal Parser (C++14)
-// -----------------------------------------------------------------------------
 
-template<char... Chars>
-constexpr int operator"" _bin() {
-    int result = 0;
-    for (char c : {Chars...}) {
-        result <<= 1;
-        static_assert(c == '0' || c == '1', "Invalid binary digit in _bin literal");
-        result |= (c - '0');
-    }
-    return result;
+template <char... Cs> constexpr int operator""_bin() 
+{
+    // static_assert is a compile‑time assertion.
+    // If the condition is false, the compiler stops with an error.
+    // Compile-time validation using lambda trick
+    // A lambda is just an anonymous function you can write anywhere.
+    // []{ static_assert(...); }(); This creates a lambda that performs a static assertion and immediately invokes it.
+    // ( something, ... ); is a fold expression that applies the operator to all elements in the parameter pack Cs.
+    ([]{ static_assert(Cs == '0' || Cs == '1', "Invalid binary digit in _bin literal"); }(), ...);
+    int value = 0;
+    ((value = (value << 1) + (Cs - '0')), ...);// Fold expression to compute the binary value
+    return value;
 }
 
-//
-// -----------------------------------------------------------------------------
-// 7. Standard Library UDLs
-// -----------------------------------------------------------------------------
+#include <iostream>
 
-using namespace std::chrono_literals;       // 10s, 500ms, 2h
-using namespace std::string_literals;       // "hello"s
-using namespace std::string_view_literals;  // "hello"sv
-using namespace std::complex_literals;      // 3.0i
-using namespace std::filesystem;            // "path"_p
+void process(int) {
+    std::cout << "Integer overload\n";
+}
 
-//
-// -----------------------------------------------------------------------------
-// MAIN DEMONSTRATION
-// -----------------------------------------------------------------------------
+void process(const char*) {
+    std::cout << "Pointer overload\n";
+}
 
 int main() {
+    // null pointer
+    process(0);        // Calls process(int)
+    process(nullptr);  // Calls process(const char*)
+
+    constexpr int value1 = 1010_bin; // 10 in decimal
+    constexpr int value2 = 1111_bin; // 15 in decimal
+    std::cout << "Value 1: " << value1 << std::endl;
+    std::cout << "Value 2: " << value2 << std::endl;
+    int value = 0;
 
     // --- Floating-point UDLs ---
     long double dist = 5.0_km + 300.0_m;
@@ -149,7 +162,7 @@ int main() {
     std::cout << "Strong type meters: " << c.value << "\n";
 
     // --- Template string UDL ---
-    auto name = "Aloth"_s;
+    auto name = "Aloth_s";
     std::cout << "Name: " << name << "\n";
 
     // --- Standard library string UDL ---
@@ -171,12 +184,8 @@ int main() {
     std::cout << "Complex number: " << z << "\n";
 
     // --- Filesystem path UDL ---
-    auto path = "config.json"_p;
+    auto path = "config.json_p";
     std::cout << "Filesystem path: " << path << "\n";
-
-    // --- Binary literal ---
-    constexpr int val = "1011"_bin;  // 11
-    std::cout << "Binary 1011 = " << val << "\n";
 
     return 0;
 }
