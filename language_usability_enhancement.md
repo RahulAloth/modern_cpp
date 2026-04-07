@@ -142,7 +142,7 @@ C++20 effectively blurs the line between compile time and runtime.
 
 ---
 #### Examples 
-- [`const_expr.cpp`](modern_cpp/const_expr.cpp)
+- [`const_expr.cpp`](/const_expr.cpp)
 
 # User‑Defined Literals (UDLs)
 
@@ -224,7 +224,7 @@ auto d = 60s;
 The second is clearer and harder to misuse.
 
 ---
-- [User‑Defined Literals Example](src/user_defined_literals.cpp)
+- [User‑Defined Literals Example](/user_defined_literals.cpp)
 ## Summary of UDL Theory
 
 | Concept | Explanation |
