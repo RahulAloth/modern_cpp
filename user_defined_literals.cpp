@@ -1,84 +1,191 @@
 /*
-User-defined literals (UDLs) in C++ are a powerful feature introduced in C++11 and enhanced in C++14 that allow 
-programmers to define custom behavior for literal values (like numbers, strings, etc.) by attaching a suffix to them.
-This makes code more expressive and readable.
-What Are User-Defined Literals?
+    User-Defined Literals (UDLs) in Modern C++
+    ------------------------------------------
 
-Syntax Overview
-User-defined literals are defined using special functions with the operator"" syntax.
+    User-defined literals allow programmers to attach custom suffixes to literal
+    values (numbers, strings, characters) to give them semantic meaning.
 
-Types of UDLs:
-Integer literals (unsigned long long)
-Floating-point literals (long double)
-Character literals (char)
-String literals (const char*, const wchar_t*, etc.)
-Raw string literals (const char*, etc.)
+    Introduced in:  C++11
+    Enhanced in:    C++14 (template UDLs)
+                    C++17 (string_view, filesystem)
+                    C++20 (constexpr std::string, constexpr containers)
 
-Example:
+    Benefits:
+        - More expressive and readable code
+        - Zero-cost abstractions
+        - Strong typing for units and domain-specific values
+        - Compile-time parsing (e.g., binary literals)
+
+    Categories of UDLs:
+        1. Integer literals:        operator"" _x(unsigned long long)
+        2. Floating-point literals: operator"" _x(long double)
+        3. Character literals:      operator"" _x(char)
+        4. String literals:         operator"" _x(const char*, size_t)
+        5. Template UDLs (C++14):   operator"" _x<Chars...>()
+
+    Standard Library UDLs:
+        - <chrono>         → 10s, 500ms, 2h
+        - <string>         → "hello"s
+        - <string_view>    → "hello"sv
+        - <complex>        → 3.0i
+        - <filesystem>     → "path"_p
 */
+
 #include <iostream>
-
-constexpr long double operator"" _km(long double val) {
-    return val * 1000;
-}
-
-constexpr long double operator"" _m(long double val) {
-    return val;
-}
-
-int main() {
-    long double dist = 5.0_km + 300.0_m;
-    std::cout << "Distance in meters: " << dist << std::endl;
-}
-
-/*
-C++14 and Beyond: UDLs with constexpr and Templates
-C++14 allows UDLs to be defined using template literals, which makes them more flexible:
-*/
-
 #include <string>
+#include <string_view>
+#include <chrono>
+#include <complex>
+#include <filesystem>
+
+//
+// -----------------------------------------------------------------------------
+// 7. Standard Library UDLs
+// -----------------------------------------------------------------------------
+
+using namespace std::chrono_literals;       // 10s, 500ms, 2h
+using namespace std::string_literals;       // "hello"s
+using namespace std::string_view_literals;  // "hello"sv
+using namespace std::complex_literals;      // 3.0i
+using namespace std::filesystem;            // "path"_p
+
+//
+// -----------------------------------------------------------------------------
+// 1. Floating-Point Unit Literals (_km, _m)
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] constexpr long double operator"" _km(long double val) {
+    return val * 1000.0L;   // kilometers → meters
+}
+
+[[nodiscard]] constexpr long double operator"" _m(long double val) {
+    return val;             // identity
+}
+
+//
+// -----------------------------------------------------------------------------
+// 2. Integer Literal UDL (_id)
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] constexpr unsigned long long operator"" _id(unsigned long long v) {
+    return v; // could wrap in a strong type
+}
+
+//
+// -----------------------------------------------------------------------------
+// 3. Character Literal UDL (_ascii)
+// -----------------------------------------------------------------------------
+
+[[nodiscard]] constexpr int operator"" _ascii(char c) {
+    return static_cast<int>(c);
+}
+
+//
+// -----------------------------------------------------------------------------
+// 4. Strong Type Example: Meter
+// -----------------------------------------------------------------------------
+
+struct Meter {
+    long double value;
+};
+
+[[nodiscard]] constexpr Meter operator"" _meter(long double v) {
+    return Meter{v};
+}
+
+[[nodiscard]] constexpr Meter operator+(Meter a, Meter b) {
+    return Meter{a.value + b.value};
+}
+
+//
+// -----------------------------------------------------------------------------
+// 5. Template UDL (C++14): Convert string literal → std::string
+// -----------------------------------------------------------------------------
 
 template<char... Chars>
-std::string operator"" _s() {
+constexpr std::string operator"" _s() {
     return std::string{Chars...};
 }
 
-auto name = "Aloth"_s;  // creates a std::string
-/*
-Use Cases
-Units of measurement (e.g., _km, _kg)
-Time durations (e.g., 10s, 5min with <chrono>)
-String manipulation (e.g., converting to std::string)
-Custom types (e.g., currency, domain-specific types)
 
-Real-World Use Case: std::chrono
-The <chrono> library uses UDLs extensively:
-*/
-
-#include <chrono>
-using namespace std::chrono_literals;
-
-auto timeout = 10s;  // 10 seconds
-auto interval = 500ms;  // 500 milliseconds
-
+template <char... Cs> constexpr int operator""_bin() 
+{
+    // static_assert is a compile‑time assertion.
+    // If the condition is false, the compiler stops with an error.
+    // Compile-time validation using lambda trick
+    // A lambda is just an anonymous function you can write anywhere.
+    // []{ static_assert(...); }(); This creates a lambda that performs a static assertion and immediately invokes it.
+    // ( something, ... ); is a fold expression that applies the operator to all elements in the parameter pack Cs.
+    ([]{ static_assert(Cs == '0' || Cs == '1', "Invalid binary digit in _bin literal"); }(), ...);
+    int value = 0;
+    ((value = (value << 1) + (Cs - '0')), ...);// Fold expression to compute the binary value
+    return value;
+}
 
 #include <iostream>
 
-// Template literal operator for binary strings
-template<char... Chars>
-constexpr int operator"" _bin() {
-    constexpr char str[] = {Chars..., '\0'};
-    int result = 0;
-    for (int i = 0; str[i] != '\0'; ++i) {
-        result <<= 1;
-        if (str[i] == '1') result |= 1;
-        else if (str[i] != '0') throw "Invalid binary digit";
-    }
-    return result;
+void process(int) {
+    std::cout << "Integer overload\n";
+}
+
+void process(const char*) {
+    std::cout << "Pointer overload\n";
 }
 
 int main() {
-    constexpr int val = "1011"_bin;  // binary 1011 = decimal 11
-    std::cout << "Binary 1011 is: " << val << std::endl;
-}
+    // null pointer
+    process(0);        // Calls process(int)
+    process(nullptr);  // Calls process(const char*)
 
+    constexpr int value1 = 1010_bin; // 10 in decimal
+    constexpr int value2 = 1111_bin; // 15 in decimal
+    std::cout << "Value 1: " << value1 << std::endl;
+    std::cout << "Value 2: " << value2 << std::endl;
+    int value = 0;
+
+    // --- Floating-point UDLs ---
+    long double dist = 5.0_km + 300.0_m;
+    std::cout << "Distance in meters: " << dist << "\n";
+
+    // --- Integer UDL ---
+    auto user = 123_id;
+    std::cout << "User ID: " << user << "\n";
+
+    // --- Character UDL ---
+    int code = 'A'_ascii;
+    std::cout << "ASCII of 'A': " << code << "\n";
+
+    // --- Strong type UDL ---
+    Meter a = 2.0_meter;
+    Meter b = 3.5_meter;
+    Meter c = a + b;
+    std::cout << "Strong type meters: " << c.value << "\n";
+
+    // --- Template string UDL ---
+    auto name = "Aloth_s";
+    std::cout << "Name: " << name << "\n";
+
+    // --- Standard library string UDL ---
+    auto s = "Hello"s;
+    std::cout << "std::string literal: " << s << "\n";
+
+    // --- String_view UDL ---
+    auto sv = "World"sv;
+    std::cout << "std::string_view literal: " << sv << "\n";
+
+    // --- Chrono UDLs ---
+    auto timeout = 10s;
+    auto interval = 500ms;
+    std::cout << "Timeout (s): " << timeout.count() << "\n";
+    std::cout << "Interval (ms): " << interval.count() << "\n";
+
+    // --- Complex number UDL ---
+    auto z = 3.0 + 4.0i;
+    std::cout << "Complex number: " << z << "\n";
+
+    // --- Filesystem path UDL ---
+    auto path = "config.json_p";
+    std::cout << "Filesystem path: " << path << "\n";
+
+    return 0;
+}
