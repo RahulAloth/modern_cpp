@@ -435,7 +435,9 @@ struct Config {
     inline static int counter = 0;
 };
 ```
-
+#### Example Code  
+- [`Uniform Initalization`](/unform_init.cpp)
+- 
 ### Summary of Variable & Initialization Enhancements
 
 | Feature                   | Introduced | Purpose                           | Benefit                                      |
