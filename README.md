@@ -293,6 +293,93 @@ This project encompasses learning topics for C++11, C++14, C++17, and C++20, inc
 | 21 | Random Number Facilities |
 | 22 | Modern Formatting & Text Handling |
 
+# Chapter 23 — SIMD & Parallelism Extensions
+
+### Chapter Index
+- Introduction to data‑parallel programming  
+- `std::simd` (C++23)  
+- Vectorized operations  
+- Hardware acceleration concepts  
+- Using execution policies with SIMD  
+- Performance considerations  
+- Practical examples (math, AI, graphics)
+
+---
+
+# Chapter 24 — Reflection & Introspection (Future C++)
+
+### Chapter Index
+- Why reflection matters  
+- Compile‑time vs runtime reflection  
+- Status of C++ reflection proposals  
+- Emulating reflection with:
+  - `magic_enum`
+  - Boost.Hana
+  - constexpr techniques  
+- Introspection patterns  
+- Future directions (C++26 and beyond)
+
+---
+
+# Chapter 25 — Guidelines Support Library (GSL)
+
+### Chapter Index
+- Purpose of GSL  
+- `span`  
+- `not_null`  
+- `owner<>`  
+- `Expects` / `Ensures`  
+- Narrowing checks  
+- Using GSL for safer Modern C++  
+- Integration with existing codebases
+
+---
+
+# Chapter 26 — ABI, ODR & Linking Deep Dive
+
+### Chapter Index
+- What is ABI (Application Binary Interface)  
+- Name mangling  
+- One Definition Rule (ODR)  
+- Inline variables & templates  
+- Dynamic vs static linking  
+- ABI stability issues  
+- Common pitfalls in large codebases  
+- Best practices for library authors
+
+---
+
+# Chapter 27 — Tooling, Sanitizers & Build Systems
+
+### Chapter Index
+- Modern CMake patterns  
+- Package managers:
+  - vcpkg
+  - Conan  
+- Static analysis tools:
+  - clang‑tidy
+  - cppcheck  
+- Sanitizers:
+  - AddressSanitizer (ASan)
+  - UndefinedBehaviorSanitizer (UBSan)
+  - ThreadSanitizer (TSan)  
+- Compiler flags for safety  
+- IDE & tooling recommendations  
+- Continuous integration for C++ projects
+
+---
+
+# Summary of Additional Advanced Chapters
+
+| Chapter | Topic |
+|--------|--------|
+| 23 | SIMD & Parallelism Extensions |
+| 24 | Reflection & Introspection |
+| 25 | Guidelines Support Library (GSL) |
+| 26 | ABI, ODR & Linking Deep Dive |
+| 27 | Tooling, Sanitizers & Build Systems |
+
+
 ## Design Patern:
 
 Refer : https://metapatterns.io/
