@@ -379,6 +379,127 @@ This project encompasses learning topics for C++11, C++14, C++17, and C++20, inc
 | 26 | ABI, ODR & Linking Deep Dive |
 | 27 | Tooling, Sanitizers & Build Systems |
 
+# Chapter 28 — Modern C++ Design Patterns
+
+### Chapter Index
+- Introduction to design patterns in Modern C++
+- RAII as a foundational pattern
+- Singleton (safe Modern C++ version)
+- Factory patterns (Simple, Abstract, Static)
+- Strategy pattern
+- Observer pattern
+- Visitor pattern (Modern C++ style)
+- Pimpl idiom (pointer-to-implementation)
+- Policy-based design
+- CRTP-based patterns
+- Type erasure patterns (`std::function`, custom erasure)
+- Coroutine-based patterns
+- Ranges-based patterns
+- Dependency Injection in Modern C++
+- Practical examples and best practices
+
+---
+
+# Chapter 29 — Testing & Quality Assurance in Modern C++
+
+### Chapter Index
+- Importance of testing in Modern C++
+- Unit testing frameworks:
+  - GoogleTest (gtest)
+  - Catch2
+  - doctest
+- Writing clean and maintainable tests
+- Mocking frameworks:
+  - GoogleMock
+  - trompeloeil
+- Property-based testing
+- Fuzz testing:
+  - libFuzzer
+  - AFL++
+- Snapshot testing
+- Test organization and naming conventions
+- Continuous testing in CI pipelines
+- Measuring test coverage
+- Best practices for reliable C++ testing
+
+---
+
+# Chapter 30 — Performance Optimization & Profiling
+
+### Chapter Index
+- Understanding performance in Modern C++
+- Compiler optimizations (O1/O2/O3/Ofast)
+- Profiling tools:
+  - perf
+  - VTune
+  - Instruments
+  - Valgrind
+- CPU architecture basics:
+  - Caches
+  - Branch prediction
+  - Prefetching
+- Memory allocation strategies:
+  - Custom allocators
+  - Pool allocators
+  - Small Buffer Optimization (SBO)
+- Avoiding performance pitfalls:
+  - False sharing
+  - Cache misses
+  - Unnecessary copies
+- Benchmarking:
+  - Google Benchmark
+  - Nonius
+- Writing high‑performance Modern C++ code
+
+---
+
+# Chapter 31 — Advanced Build & Packaging Systems
+
+### Chapter Index
+- Modern CMake (target‑based design)
+- CMake presets
+- Toolchain files
+- Cross‑compilation
+- Exporting and installing CMake targets
+- Package managers:
+  - vcpkg
+  - Conan
+- Building shared vs static libraries
+- Versioning strategies
+- Reproducible builds
+- Integrating with CI/CD
+- Best practices for scalable build systems
+
+---
+
+# Chapter 32 — Large‑Scale C++ Architecture & Best Practices
+
+### Chapter Index
+- Principles of large‑scale C++ system design
+- Layered architecture
+- Dependency management
+- ABI stability and versioning
+- Plugin architectures
+- Component boundaries and modularity
+- Error handling strategies at scale
+- Logging and diagnostics
+- Configuration management
+- Code organization patterns
+- Refactoring large C++ codebases
+- Best practices for maintainable Modern C++
+
+---
+
+# Summary of Additional Expert‑Level Chapters
+
+| Chapter | Topic |
+|--------|--------|
+| 28 | Modern C++ Design Patterns |
+| 29 | Testing & Quality Assurance |
+| 30 | Performance Optimization & Profiling |
+| 31 | Advanced Build & Packaging Systems |
+| 32 | Large‑Scale C++ Architecture & Best Practices |
+
 
 ## Design Patern:
 
