@@ -74,12 +74,33 @@ decltype(auto) a = x;    // int
 decltype(auto) b = ref;  // int&
 ```
 - Example use case
+
 ```cpp
 template <typename T>
 decltype(auto) get(T&& t) {
     return std::forward<T>(t);
 }
 ```
+
+## 2.3.4 Return Type Deduction
+
+Modern C++ allows functions to deduce their return type automatically.
+
+- C++17: decltype(auto) return
+```cpp
+decltype(auto) get_value(auto&& x) {
+    return (x);     // may return T&, T&&, or T
+}
+```
+### Summary of Type Inference Features
+
+| Feature            | Introduced | Purpose                             | Benefit                                      |
+|--------------------|------------|-------------------------------------|----------------------------------------------|
+| `auto`             | C++11      | Deduce variable types               | Removes verbosity, improves readability      |
+| `decltype`         | C++11      | Inspect expression types            | Enables precise generic programming          |
+| `decltype(auto)`   | C++14      | Deduce with exact type preservation | Perfect forwarding, reference correctness    |
+| Return type deduction | C++14/17 | Infer function return types         | Cleaner APIs, less boilerplate               |
+
 
 
 ## 2.4 Control Flow Improvements
