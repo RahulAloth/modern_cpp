@@ -416,17 +416,15 @@ auto& [x, y] = pt;  // binds by reference
 - Decomposing complex objects
 - Structured bindings are one of the most expressive additions in C++17.
 ## 2.2.4 Inline Variables (C++17)
-- Inline variable solution
-- C++17 introduced:
 
 Inline variable solution
 ```cpp
 C++17 introduced:
 ```
-- Now the variable can appear in multiple translation units without violating the One Definition Rule (ODR).
+- Now the variable can appear in multiple translation units without violating the One Definition Rule (ODR). ie, A single C++ translation unit (one .cpp file after preprocessing) may not contain more than one definition of the same variable, function, class, enumeration, or template.
 - Why inline variables matter
     - Enable header-only libraries
-    - Allow static data members to be defined inside class definitions
+    - *Allow static data members to be defined inside class definitions*
     - Simplify templates and constexpr utilities
     - Reduce boilerplate and improve encapsulation
 - Example: static class members
