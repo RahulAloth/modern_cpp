@@ -26,6 +26,8 @@ This project encompasses learning topics for C++11, C++14, C++17, and C++20, inc
 ### Chapter 2
 - [`02 Language Usability Enhancements`](/02_language_usability_enhancement.md)
 - [`02_usability_enhancement_chapter extension`](/02_usability_enhancement_ext.md)
+- [`02_template_enhancement`](/02_template_enhancement.md)
+  
 
 ### Chapter Index
 ### 2.1 Constants & Literals
