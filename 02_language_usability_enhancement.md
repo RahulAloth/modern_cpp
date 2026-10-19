@@ -142,7 +142,7 @@ C++20 effectively blurs the line between compile time and runtime.
 
 ---
 #### Examples 
-- [`const_expr.cpp`](modern_cpp/const_expr.cpp)
+- [`const_expr.cpp`](/const_expr.cpp)
 
 # User‑Defined Literals (UDLs)
 
@@ -224,7 +224,7 @@ auto d = 60s;
 The second is clearer and harder to misuse.
 
 ---
-- [User‑Defined Literals Example](src/user_defined_literals.cpp)
+- [User‑Defined Literals Example](/user_defined_literals.cpp)
 ## Summary of UDL Theory
 
 | Concept | Explanation |
@@ -416,17 +416,15 @@ auto& [x, y] = pt;  // binds by reference
 - Decomposing complex objects
 - Structured bindings are one of the most expressive additions in C++17.
 ## 2.2.4 Inline Variables (C++17)
-- Inline variable solution
-- C++17 introduced:
 
 Inline variable solution
 ```cpp
 C++17 introduced:
 ```
-- Now the variable can appear in multiple translation units without violating the One Definition Rule (ODR).
+- Now the variable can appear in multiple translation units without violating the One Definition Rule (ODR). ie, A single C++ translation unit (one .cpp file after preprocessing) may not contain more than one definition of the same variable, function, class, enumeration, or template.
 - Why inline variables matter
     - Enable header-only libraries
-    - Allow static data members to be defined inside class definitions
+    - *Allow static data members to be defined inside class definitions*
     - Simplify templates and constexpr utilities
     - Reduce boilerplate and improve encapsulation
 - Example: static class members
@@ -435,7 +433,9 @@ struct Config {
     inline static int counter = 0;
 };
 ```
-
+#### Example Code  
+- [`Uniform Initalization`](/unform_init.cpp)
+- 
 ### Summary of Variable & Initialization Enhancements
 
 | Feature                   | Introduced | Purpose                           | Benefit                                      |
