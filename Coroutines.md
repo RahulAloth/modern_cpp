@@ -1443,3 +1443,600 @@ Now the output becomes:
 ```
 
 confirming proper cleanup.
+
+
+
+# Returning Values and Building a Simple Coroutine Generator
+
+## Goal
+
+So far, we have created a coroutine that can execute and suspend.
+
+The next step is learning:
+
+1. How to return a value from a coroutine.
+2. How to expose that value to the caller.
+3. How `co_yield` differs from `co_return`.
+4. How to build a simple generator that can produce multiple values lazily.
+
+---
+
+# Returning a Value from a Coroutine
+
+Consider a coroutine that adds two numbers:
+
+```cpp
+task coAdd(int a, int b)
+{
+    co_return a + b;
+}
+```
+
+Unlike:
+
+```cpp
+co_return;
+```
+
+which returns nothing, this coroutine returns a value.
+
+---
+
+# `return_value()` Replaces `return_void()`
+
+When a coroutine returns a value, the promise type must provide:
+
+```cpp
+return_value(...)
+```
+
+instead of:
+
+```cpp
+return_void()
+```
+
+Example:
+
+```cpp
+struct promise_type
+{
+    void return_value(int value)
+    {
+        m_value = value;
+    }
+};
+```
+
+The compiler automatically calls:
+
+```cpp
+return_value(a + b);
+```
+
+when:
+
+```cpp
+co_return a + b;
+```
+
+executes.
+
+---
+
+# Storing the Result
+
+The returned value must be stored somewhere inside the coroutine.
+
+Example:
+
+```cpp
+struct promise_type
+{
+    int m_value {};
+
+    void return_value(int value)
+    {
+        m_value = value;
+    }
+};
+```
+
+---
+
+# Exposing the Result to the Caller
+
+Since the value lives inside the promise object, the coroutine type must provide access to it.
+
+Example:
+
+```cpp
+int getValue()
+{
+    return handle_.promise().m_value;
+}
+```
+
+Important:
+
+```cpp
+handle_.promise()
+```
+
+gives access to the promise instance associated with the coroutine.
+
+---
+
+# Accessing Promise Data
+
+Conceptually:
+
+```text
+task
+  │
+  ▼
+Coroutine Handle
+  │
+  ▼
+promise_type
+  │
+  ▼
+m_value
+```
+
+The caller interacts with the `task` object, while the value is actually stored inside the promise.
+
+---
+
+# Example Usage
+
+```cpp
+auto result = coAdd(10, 20);
+
+result.resume();
+
+std::cout << result.getValue();
+```
+
+Output:
+
+```text
+30
+```
+
+---
+
+# Why `final_suspend()` Should Return `suspend_always`
+
+When retrieving results after completion:
+
+```cpp
+std::suspend_always final_suspend() noexcept
+{
+    return {};
+}
+```
+
+is generally preferred.
+
+Reason:
+
+```text
+Coroutine Completes
+       ↓
+Result Preserved
+       ↓
+Caller Reads Value
+       ↓
+Coroutine Destroyed Later
+```
+
+If the coroutine is destroyed immediately, the result may no longer be accessible.
+
+---
+
+# Lifecycle of a Returning Coroutine
+
+```text
+coAdd()
+    ↓
+Create promise_type
+    ↓
+Create task
+    ↓
+initial_suspend()
+    ↓
+resume()
+    ↓
+Execute co_return
+    ↓
+return_value()
+    ↓
+Store Result
+    ↓
+final_suspend()
+    ↓
+Caller Reads Result
+```
+
+---
+
+# Moving from `co_return` to `co_yield`
+
+`co_return` produces a final result.
+
+```cpp
+co_return value;
+```
+
+The coroutine finishes after returning the value.
+
+---
+
+`co_yield` behaves differently.
+
+```cpp
+co_yield value;
+```
+
+The coroutine:
+
+1. Produces a value.
+2. Suspends.
+3. Can later resume again.
+
+This allows multiple values to be generated from a single coroutine.
+
+---
+
+# Creating a Simple Generator
+
+Example:
+
+```cpp
+generator generate()
+{
+    for (int i = 0; i <= 5; ++i)
+    {
+        co_yield i;
+    }
+}
+```
+
+Output sequence:
+
+```text
+0
+1
+2
+3
+4
+5
+```
+
+Values are produced one at a time.
+
+---
+
+# Supporting `co_yield`
+
+To use:
+
+```cpp
+co_yield value;
+```
+
+the promise type must implement:
+
+```cpp
+yield_value(...)
+```
+
+Example:
+
+```cpp
+std::suspend_always yield_value(int value)
+{
+    m_value = value;
+    return {};
+}
+```
+
+---
+
+# What Happens During `co_yield`
+
+When:
+
+```cpp
+co_yield 3;
+```
+
+executes:
+
+```text
+yield_value(3)
+        ↓
+Store Value
+        ↓
+Suspend Coroutine
+        ↓
+Return Control To Caller
+```
+
+Unlike `co_return`, execution does not end here.
+
+---
+
+# Why `return_void()` Is Used Again
+
+The generator itself does not return a final value.
+
+Therefore:
+
+```cpp
+void return_void()
+{
+}
+```
+
+is used again.
+
+The generated values come through:
+
+```cpp
+co_yield
+```
+
+not through:
+
+```cpp
+co_return
+```
+
+---
+
+# Storing Yielded Values
+
+The promise stores the current yielded value.
+
+```cpp
+struct promise_type
+{
+    int m_value {};
+};
+```
+
+Whenever:
+
+```cpp
+yield_value()
+```
+
+is invoked:
+
+```cpp
+m_value = value;
+```
+
+updates the current output.
+
+---
+
+# Accessing Generated Values
+
+The coroutine type can expose:
+
+```cpp
+int getValue()
+{
+    return handle_.promise().m_value;
+}
+```
+
+which returns the most recently yielded value.
+
+---
+
+# Detecting Completion
+
+A generator needs a way to determine whether it has finished.
+
+Example:
+
+```cpp
+bool done() const
+{
+    return !handle_ || handle_.done();
+}
+```
+
+---
+
+# Understanding `done()`
+
+Returns:
+
+```text
+true  → coroutine finished
+
+false → coroutine still active
+```
+
+Conceptually:
+
+```text
+Coroutine Running
+        ↓
+Yield Values
+        ↓
+Loop Finishes
+        ↓
+Coroutine Done
+```
+
+---
+
+# Using the Generator
+
+Example:
+
+```cpp
+auto gen = generate();
+
+while (!gen.done())
+{
+    gen.resume();
+
+    if (!gen.done())
+    {
+        std::cout << gen.getValue() << '\n';
+    }
+}
+```
+
+Output:
+
+```text
+0
+1
+2
+3
+4
+5
+```
+
+---
+
+# What Happens on Each Iteration
+
+First iteration:
+
+```text
+resume()
+    ↓
+co_yield 0
+    ↓
+yield_value(0)
+    ↓
+Suspend
+```
+
+Second iteration:
+
+```text
+resume()
+    ↓
+co_yield 1
+    ↓
+yield_value(1)
+    ↓
+Suspend
+```
+
+And so on.
+
+---
+
+# Difference Between `co_return` and `co_yield`
+
+| Feature | `co_return` | `co_yield` |
+|----------|------------|------------|
+| Produces value | Yes | Yes |
+| Suspends coroutine | No | Yes |
+| Ends coroutine | Yes | No |
+| Can be called multiple times | No | Yes |
+| Uses promise function | `return_value()` | `yield_value()` |
+
+---
+
+# Coroutine State During Generation
+
+```text
+Caller
+   │
+   ▼
+resume()
+   │
+   ▼
+Generator Coroutine
+   │
+   ├── co_yield 0
+   ├── Suspend
+   │
+   ├── co_yield 1
+   ├── Suspend
+   │
+   ├── co_yield 2
+   ├── Suspend
+   │
+   └── co_return
+          ↓
+      Complete
+```
+
+---
+
+# Relationship to `std::generator`
+
+Our implementation works similarly to:
+
+```cpp
+std::generator<int>
+```
+
+Both:
+
+- Use `co_yield`
+- Suspend after each value
+- Resume on demand
+- Generate values lazily
+
+However, the standard library implementation additionally provides:
+
+- Iterator support
+- Range support
+- Integration with the Ranges library
+- More complete error handling
+- Better standard-compliant behavior
+
+---
+
+# Key Takeaways
+
+- Returning a value requires `return_value()` instead of `return_void()`.
+- `co_return value` automatically invokes `return_value(value)`.
+- Returned values are typically stored inside the promise.
+- The coroutine handle can access promise members through `handle.promise()`.
+- `co_yield` enables lazy generation of multiple values.
+- Supporting `co_yield` requires implementing `yield_value()`.
+- `yield_value()` usually stores a value and returns `std::suspend_always`.
+- Each `co_yield` suspends the coroutine and returns control to the caller.
+- `done()` can be used to determine whether generation has completed.
+- Simple generators are conceptually similar to `std::generator`, but lack iterator and range support.
+
+---
+
+# Mental Model
+
+```text
+co_return
+    ↓
+One Final Result
+    ↓
+Coroutine Ends
+
+
+co_yield
+    ↓
+Value 1
+Suspend
+    ↓
+Value 2
+Suspend
+    ↓
+Value 3
+Suspend
+    ↓
+Coroutine Ends
+```
