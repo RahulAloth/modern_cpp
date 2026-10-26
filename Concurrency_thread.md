@@ -347,3 +347,680 @@ Heavy Work     -> Main Thread ❌
 Or simply:
 
 "Never block the UI thread."
+
+# Joinable Threads and Detached Threads
+
+---
+
+# 1. Creating Threads in C++11
+
+C++11 introduced the `<thread>` library which allows programs to execute multiple tasks concurrently.
+
+The central class is:
+
+```cpp
+std::thread
+```
+
+This class represents a thread of execution.
+
+---
+
+# 2. What is a Callable?
+
+The `std::thread` constructor accepts a **callable object**.
+
+A callable is anything that can be invoked like a function.
+
+Examples:
+
+### Function Pointer
+
+```cpp
+void Download();
+
+std::thread t(Download);
+```
+
+### Function Object (Functor)
+
+```cpp
+struct Downloader
+{
+    void operator()()
+    {
+        // work
+    }
+};
+
+std::thread t(Downloader());
+```
+
+### Lambda Function
+
+```cpp
+std::thread t([]()
+{
+    std::cout << "Hello";
+});
+```
+
+---
+
+# 3. How std::thread Works
+
+When a thread object is created:
+
+```cpp
+std::thread t(Download);
+```
+
+the following happens:
+
+```text
+Main Thread
+     |
+     +--> Creates Child Thread
+                |
+                +--> Executes Download()
+```
+
+Important:
+
+✅ Thread creation is non-blocking.
+
+The constructor returns immediately.
+
+```text
+Create Thread
+      |
+      +--> Child Thread Starts
+      |
+      +--> Main Continues
+```
+
+The main thread does not wait for the child thread to begin execution.
+
+---
+
+# 4. Basic Example
+
+```cpp
+#include <iostream>
+#include <thread>
+
+void Download()
+{
+    std::cout << "Downloading...\n";
+}
+
+int main()
+{
+    std::thread t(Download);
+
+    t.join();
+}
+```
+
+---
+
+# 5. Two Threads are Now Running
+
+After creating the thread:
+
+```cpp
+std::thread t(Download);
+```
+
+there are now two independent execution paths:
+
+```text
+Process
+│
+├── Main Thread
+│
+└── Child Thread
+      │
+      └── Download()
+```
+
+Both threads execute concurrently.
+
+---
+
+# 6. The Problem if Main Exits Early
+
+Consider:
+
+```cpp
+int main()
+{
+    std::thread t(Download);
+
+    return 0;
+}
+```
+
+Possible execution:
+
+```text
+Main Thread
+     |
+     +--> Creates Child Thread
+     |
+     +--> Returns
+     |
+     +--> Process Terminates
+
+Child Thread
+     |
+     +--> Did not finish
+```
+
+When `main()` returns:
+
+```text
+Exit Process
+```
+
+is called.
+
+This terminates the process and all threads inside it.
+
+The child thread may never complete.
+
+---
+
+# 7. Joinable Threads
+
+By default every newly created thread is:
+
+```text
+JOINABLE
+```
+
+Example:
+
+```cpp
+std::thread t(Download);
+```
+
+creates a joinable thread.
+
+A joinable thread expects someone to wait for its completion.
+
+---
+
+# 8. Joining a Thread
+
+Use:
+
+```cpp
+t.join();
+```
+
+Example:
+
+```cpp
+std::thread t(Download);
+
+t.join();
+```
+
+Execution:
+
+```text
+Main Thread
+     |
+     +--> Create Child
+     |
+     +--> Wait at join()
+                |
+                +--> Child finishes
+                |
+                +--> Main resumes
+```
+
+---
+
+# 9. What Does join() Do?
+
+`join()` performs two tasks:
+
+### 1. Waits for Completion
+
+```text
+Main Thread BLOCKS
+```
+
+until the child thread finishes.
+
+### 2. Reclaims Thread Resources
+
+Operating system resources used by the thread are released safely.
+
+---
+
+# 10. Why join() is Mandatory
+
+Consider:
+
+```cpp
+void func()
+{
+    std::thread t(Download);
+
+}   // thread object destroyed here
+```
+
+When the thread object leaves scope:
+
+```cpp
+~thread()
+```
+
+is invoked.
+
+If the thread is still joinable:
+
+```text
+std::terminate()
+```
+
+is called.
+
+Program crashes immediately.
+
+---
+
+# 11. Critical Rule
+
+Always do one of the following before destruction:
+
+```cpp
+t.join();
+```
+
+or
+
+```cpp
+t.detach();
+```
+
+Never leave a joinable thread unmanaged.
+
+---
+
+# 12. Visualizing a Joinable Thread
+
+```text
+Main Thread
+     |
+     +--> std::thread t(...)
+     |
+     +--> t.join()
+             |
+             +--> Wait
+                     |
+                     +--> Child finishes
+             |
+             +--> Continue
+```
+
+---
+
+# 13. Detached Threads
+
+Sometimes a task should continue in the background.
+
+Examples:
+
+- Logging
+- File monitoring
+- Telemetry
+- Background cleanup
+- Analytics
+
+In such situations we may not want to wait.
+
+Use:
+
+```cpp
+t.detach();
+```
+
+Example:
+
+```cpp
+std::thread t(Download);
+
+t.detach();
+```
+
+---
+
+# 14. What Happens After detach()?
+
+Execution becomes:
+
+```text
+Main Thread
+      |
+      +--> Create Child
+      |
+      +--> Detach Child
+      |
+      +--> Continue
+```
+
+Now:
+
+```text
+Child Thread
+      |
+      +--> Runs Independently
+```
+
+The thread is no longer associated with the thread object.
+
+---
+
+# 15. Detached Thread Characteristics
+
+### Main Thread Does Not Wait
+
+```cpp
+t.detach();
+```
+
+removes the waiting requirement.
+
+### Child Runs Independently
+
+```text
+Main -----> exits
+Child ----> may continue
+```
+
+as long as the process itself remains alive.
+
+### Resources are Automatically Released
+
+When the detached thread finishes:
+
+```text
+OS automatically cleans resources.
+```
+
+---
+
+# 16. Detached Threads Cannot Be Joined
+
+This is illegal:
+
+```cpp
+t.detach();
+
+t.join();     // ERROR
+```
+
+After detaching:
+
+```text
+No ownership remains.
+```
+
+The thread object no longer controls the thread.
+
+---
+
+# 17. Checking Thread State
+
+Use:
+
+```cpp
+t.joinable()
+```
+
+Example:
+
+```cpp
+if (t.joinable())
+{
+    t.join();
+}
+```
+
+This prevents errors.
+
+---
+
+# 18. joinable() Behavior
+
+### Before Join
+
+```cpp
+std::thread t(Download);
+
+t.joinable();
+```
+
+returns:
+
+```text
+true
+```
+
+### Before Detach
+
+```cpp
+std::thread t(Download);
+
+t.joinable();
+```
+
+returns:
+
+```text
+true
+```
+
+### After Join
+
+```cpp
+t.join();
+```
+
+returns:
+
+```text
+false
+```
+
+### After Detach
+
+```cpp
+t.detach();
+```
+
+returns:
+
+```text
+false
+```
+
+---
+
+# 19. One-Way Transition
+
+A thread can move from:
+
+```text
+Joinable
+    |
+    +--> Joined
+```
+
+or
+
+```text
+Joinable
+    |
+    +--> Detached
+```
+
+But:
+
+```text
+Detached
+    |
+    +--> Joinable
+```
+
+❌ Impossible
+
+Once detached, ownership is lost permanently.
+
+---
+
+# 20. Why Detached Threads Need Care
+
+Dangerous example:
+
+```cpp
+void Download()
+{
+    // uses global data
+}
+
+int main()
+{
+    std::thread t(Download);
+
+    t.detach();
+
+    return 0;
+}
+```
+
+Execution:
+
+```text
+Main exits
+Process terminates
+Child thread killed
+```
+
+The detached thread may never complete.
+
+Detaching does **not** keep the process alive.
+
+---
+
+# 21. Join vs Detach
+
+| Feature | join() | detach() |
+|----------|---------|---------|
+| Waits for completion | ✅ Yes | ❌ No |
+| Main thread blocks | ✅ Yes | ❌ No |
+| Reclaims resources | ✅ Yes | ✅ Yes |
+| Thread remains controlled | ✅ Yes | ❌ No |
+| Can call join later | ✅ Yes | ❌ No |
+| Best for important work | ✅ Yes | ❌ Risky |
+
+---
+
+# 22. Life Cycle of a Thread
+
+```text
+Thread Created
+      |
+      V
+Joinable
+     / \
+    /   \
+join() detach()
+   |       |
+   V       V
+Joined Detached
+   |       |
+   +--- Resources Released ---+
+```
+
+---
+
+# Exam / Interview Notes
+
+### Q1: Which header provides threading support?
+
+```cpp
+#include <thread>
+```
+
+---
+
+### Q2: What is a joinable thread?
+
+A thread that has been created and not yet joined or detached.
+
+---
+
+### Q3: What happens if a joinable thread is destroyed?
+
+```text
+std::terminate() is called.
+```
+
+---
+
+### Q4: What does join() do?
+
+1. Waits for child thread completion.
+2. Cleans up thread resources.
+
+---
+
+### Q5: What does detach() do?
+
+Separates the thread from its thread object and allows it to execute independently.
+
+---
+
+### Q6: Can a detached thread be joined later?
+
+```text
+No.
+```
+
+---
+
+### Q7: Can a detached thread become joinable again?
+
+```text
+No.
+```
+
+---
+
+# Memory Aid
+
+```text
+JOIN
+  = Wait For Thread
+
+DETACH
+  = Forget The Thread
+
+JOINABLE
+  = Must Handle Before Destruction
+```
+
+Most beginners should follow:
+
+```text
+Create Thread
+      +
+Join Thread
+```
+
+until they fully understand thread lifetimes and synchronization.
